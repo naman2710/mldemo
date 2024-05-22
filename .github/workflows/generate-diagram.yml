@@ -63,8 +63,8 @@ jobs:
     - name: Generate UML diagram
       run: plantuml diagram.puml
 
-    - name: Commit UML diagram
-      uses: stefanzweifel/git-auto-commit-action@v4
+    - name: Upload UML diagram as artifact
+      uses: actions/upload-artifact@v2
       with:
-        commit_message: "Update UML diagram"
-        file_pattern: "*.png"
+          name: uml-diagram
+          path: diagram.png
