@@ -1,0 +1,41 @@
+name: Generate UML Diagram
+
+on:
+  push:
+    paths:
+      - description.md
+  workflow_dispatch:
+
+jobs:
+  generate-diagram:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install pyyaml
+
+    - name: Generate PlantUML file
+      id: generate_puml
+      run: python generate-puml-with-input-text.py
+
+    - name: Set up PlantUML
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y plantuml
+
+    - name: Generate UML diagram
+      run: plantuml diagram.puml
+
+    - name: Upload UML diagram as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: uml-diagram
+        path: diagram.png
