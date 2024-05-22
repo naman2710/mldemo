@@ -1,4 +1,4 @@
-name: Generate UML Diagram
+name: generate-diagram-with-input-desc
 
 on:
   push:
