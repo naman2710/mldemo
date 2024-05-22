@@ -1,0 +1,70 @@
+name: Generate UML Diagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      cloud_provider:
+        description: 'Cloud Provider (e.g., AWS, Azure)'
+        required: true
+        default: 'AWS'
+      ci_cd_tool:
+        description: 'CI/CD Tool'
+        required: true
+        default: 'Jenkins'
+      container_registry:
+        description: 'Container Registry'
+        required: true
+        default: 'Amazon ECR'
+      container_orchestration:
+        description: 'Container Orchestration Tool'
+        required: true
+        default: 'Kubernetes'
+      config_management:
+        description: 'Configuration Management Tool'
+        required: true
+        default: 'Ansible'
+      infra_provisioning:
+        description: 'Infrastructure Provisioning Tool'
+        required: true
+        default: 'Terraform'
+
+jobs:
+  generate-diagram:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install pyyaml
+
+    - name: Generate PlantUML file
+      id: generate_puml
+      run: |
+        python generate_puml.py \
+          --cloud-provider "${{ github.event.inputs.cloud_provider }}" \
+          --ci-cd-tool "${{ github.event.inputs.ci_cd_tool }}" \
+          --container-registry "${{ github.event.inputs.container_registry }}" \
+          --container-orchestration "${{ github.event.inputs.container_orchestration }}" \
+          --config-management "${{ github.event.inputs.config_management }}" \
+          --infra-provisioning "${{ github.event.inputs.infra_provisioning }}"
+
+    - name: Set up PlantUML
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y plantuml
+
+    - name: Generate UML diagram
+      run: plantuml diagram.puml
+
+    - name: Commit UML diagram
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Update UML diagram"
+        file_pattern: "*.png"
